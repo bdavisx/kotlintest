@@ -28,16 +28,31 @@ Maven:
 You can choose a testing style by extending WordSpec, FunSpec, ShouldSpec, FlatSpec or FreeSpec in your test class, and writing your tests inside an init {} block. _In ScalaTest, the body of the class is the constructor, so you write tests directly in the class body. The KotlinTest equivalent is the init block._
 
 ```kotlin
-class MyTests : WordSpec() {
+class MyTests : StringSpec() {
   init {
     // tests here
   }
 }
 ```
 
+#### String Spec
+
+`StringSpec` reduces the syntax to the absolute minimum. Just write a string folled by a lambda expression with your test code. If in doubt, use this style.
+
+```kotlin
+class StringSpecExample : StringSpec() {
+  init {
+    "strings.size should return size of string" {
+      "hello".length shouldBe 5
+      "hello" should haveLength(5)
+    }
+  }
+}
+```
+
 #### Flat Spec
 
-Flat spec offers the keywords `should`, and `with`, and allows those to be used inline, as such:
+`FlatSpec` offers the keywords `should`, and `with`, and allows those to be used inline, as such:
 
 ```kotlin
 class MyTests : FlatSpec() {
@@ -52,7 +67,7 @@ class MyTests : FlatSpec() {
 
 #### Fun Spec
 
-Fun spec allows you to create tests similar to the junit style. You invoke a method called test, with a string parameter to describe the test, and then the test itself:
+`FunSpec` allows you to create tests similar to the junit style. You invoke a method called test, with a string parameter to describe the test, and then the test itself:
 
 ```kotlin
 class MyTests : FunSpec() {
@@ -67,7 +82,7 @@ class MyTests : FunSpec() {
 
 #### Should spec
 
-Should spec is similar to fun spec, but uses the keyword `should` instead of `test`. Eg:
+`ShouldSpec` is similar to fun spec, but uses the keyword `should` instead of `test`. Eg:
 
 ```kotlin
 class MyTests : ShouldSpec() {
@@ -97,7 +112,7 @@ class MyTests : ShouldSpec() {
 
 #### Word Spec
 
-Word spec uses the keyword `should` and uses that to nest test blocks after a context string, eg:
+`WordSpec` uses the keyword `should` and uses that to nest test blocks after a context string, eg:
 
 ```kotlin
 class MyTests : WordSpec() {
@@ -114,7 +129,7 @@ class MyTests : WordSpec() {
 
 #### Flat Spec
 
-Flat spec allows you to nest arbitary levels of depth using the keywords `-` (minus), as such:
+`FlatSpec` allows you to nest arbitary levels of depth using the keywords `-` (minus), as such:
 
 ```kotlin
 class MyTests : FlatSpec() {
@@ -148,16 +163,6 @@ KotlinTest has many built in matchers, along a similar line to the popular [hamc
 
 * To assert that a collection has a given size use `col should have size 4`. This is the same as `(col.size == 4) shouldBe true` but more readable.
 * To assert that a collection contains a given element use `col should contain element x`.
-* To assert that a collection has a given collection of elements in any order, you can use `col should containInAnyOrder(xs)`
-
-#### Map Matchers
-
-* To assert that a map has a given key, use `map should haveKey(key)`
-* To assert that a map has a given value, use `map should haveValue(value)`
-
-#### References
-
-* To assert that two instances are the same reference, you can use `x should beTheSameInstanceAs(y)`
 
 ### Exceptions
 
@@ -238,7 +243,7 @@ Each test can be configured with various parameters. After the test block, invok
 * `invocations` - the number of times to run this test. Useful if you have a non-deterministic test and you want to run that particular test a set number of times. Defaults to 1.
 * `threads` - Allows the invocation of this test to be parallelized by setting the number of threads to use in a thread pool executor for this test. If invocations is 1 (the default) then this parameter will have no effect. Similarly, if you set invocations to a value less than or equal to the number threads, then each invocation will have its own thread.
 * `ignored` - If set to true then this test is ignored. Can be useful if a test needs to be temporarily disabled.
-* `timeout` - sets a timeout for this test. If the test has not finished in that time then the test fails. Useful for code that is non-deterministic and might not finish. Timeout is of type `Duration` which can be instantiated like `2.seconds`, `3.minutes` and so on.
+* `timeout` / `timeoutUnit` - sets a timeout for this test. If the test has not finished in that time then the test fails. Useful for code that is non-deterministic and might not finish.
 * `tag` / `tags` - a list of String tags that can be set on a test. Then by invoking the test runner with a system property of testTags, you can control which tests are run. For example, tests that require a linux based O/S might be tagged with "linux" then gradle could be invoked with gradle test -DtestTags=linux. Another example might be tagging database tags that you only want to run on a server that has a database installed. Any test that has no tags is always run.
 
 Examples of setting config:
@@ -261,7 +266,7 @@ class MyTests : WordSpec() {
       "return the length of the string" {
         "sammy".length shouldBe 5
         "".length shouldBe 0
-      }.config(timeout = 2.seconds)
+      }.config(timeout=2, timeoutUnit=TimeUnit.SECONDS)
     }
   }
 }
