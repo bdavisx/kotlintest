@@ -55,15 +55,14 @@ abstract class TestBase : Matchers {
 
 
   private fun runOneInstancePerTest(notifier: RunNotifier): Unit {
-    val testCount = root.tests().size // TODO move to TestSuite
+    val testCount = root.tests().size
     for (k in (0..testCount - 1)) {
       val instance = javaClass.newInstance()
       val testcase = instance.root.tests()[k]
       if (testcase.active() && testcase.isTagged) {
-        val desc = testcase.description
         instance.beforeAll()
         instance.afterEach()
-        runTest(testcase, notifier, desc!!)
+        runTest(testcase, notifier, testcase.description)
         instance.afterEach()
         instance.performAfterAll()
       }
@@ -74,9 +73,8 @@ abstract class TestBase : Matchers {
     beforeAll()
     val tests = root.tests()
     tests.filter { it.isTagged }.filter { it.active() }.forEach { testcase ->
-      val desc = testcase.description
       beforeEach()
-      runTest(testcase, notifier, desc!!)
+      runTest(testcase, notifier, testcase.description)
       afterEach()
     }
     performAfterAll()
